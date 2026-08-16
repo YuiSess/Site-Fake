@@ -1,0 +1,2639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Google</title>
+<link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%234285F4' d='M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z'/></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;font-family:Arial,sans-serif;background:#0a0e18;color:#fff}
+
+/* GOOGLE FAKE */
+#gpage{position:fixed;inset:0;background:#fff;color:#202124;z-index:1000;display:flex;flex-direction:column}
+#gpage.hide{display:none}
+.g-header{display:flex;justify-content:flex-end;align-items:center;padding:14px 24px;gap:14px;font-size:13px}
+.g-header a{color:rgba(0,0,0,0.87);text-decoration:none;padding:6px 8px}
+.g-header a:hover{text-decoration:underline}
+.g-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px}
+.g-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:80px}
+.g-logo{font-size:92px;font-weight:400;margin-bottom:32px;font-family:Arial,sans-serif;letter-spacing:-2px}
+.g-logo .l1{color:#4285F4}.g-logo .l2{color:#EA4335}.g-logo .l3{color:#FBBC05}
+.g-logo .l4{color:#4285F4}.g-logo .l5{color:#34A853}.g-logo .l6{color:#EA4335}
+.g-search-wrap{width:100%;max-width:584px;display:flex;flex-direction:column;align-items:center}
+.g-search-container{position:relative;width:100%}
+.g-search{width:100%;height:46px;border:1px solid #dfe1e5;border-radius:24px;padding:0 50px;font-size:16px;background:#fff;outline:none;font-family:inherit}
+.g-search:hover,.g-search:focus{box-shadow:0 1px 6px rgba(32,33,36,0.28);border-color:transparent}
+.g-search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#9aa0a6;pointer-events:none}
+.g-btns{display:flex;gap:12px;margin-top:28px}
+.g-btn{background:#f8f9fa;border:1px solid #f8f9fa;color:#3c4043;padding:9px 16px;border-radius:4px;font-size:14px;cursor:pointer;font-family:inherit}
+.g-btn:hover{box-shadow:0 1px 1px rgba(0,0,0,0.1);background:#f8f9fa;border:1px solid #dadce0;color:#202124}
+.g-footer{background:#f2f2f2;padding:14px 24px;font-size:13px;color:rgba(0,0,0,0.54);border-top:1px solid #dadce0}
+.g-footer-top{display:flex;justify-content:space-between}
+.g-footer-bot{display:flex;justify-content:space-between;margin-top:8px}
+.g-footer a{color:#70757a;text-decoration:none;padding:4px 8px}
+.g-footer a:hover{text-decoration:underline}
+
+/* ANTI HISTÓRICO (simples) */
+#antiOver{position:fixed;inset:0;background:#000;z-index:99999;display:none;align-items:center;justify-content:center;flex-direction:column}
+#antiOver.show{display:flex}
+.anti-title{font-size:80px;font-weight:900;color:#00e676;text-shadow:0 0 30px rgba(0,230,118,0.5);font-family:Arial,sans-serif;letter-spacing:-2px;text-align:center}
+.anti-sub{font-size:14px;color:rgba(0,230,118,0.7);letter-spacing:6px;text-transform:uppercase;margin-top:16px;font-family:'Courier New',monospace}
+.anti-status{font-size:12px;color:rgba(0,230,118,0.5);margin-top:24px;font-family:'Courier New',monospace}
+
+/* SITE */
+#deepg{display:none;min-height:100vh;background:#0a0e18}
+#deepg.show{display:block}
+
+/* Sidebar */
+.sidebar{position:fixed;left:12px;top:12px;width:60px;height:calc(100vh - 24px);background:#0f1420;border:1px solid #1a2030;padding:10px 6px;border-radius:8px;overflow-y:auto;z-index:100}
+.sidebar::-webkit-scrollbar{width:0}
+.sidebar-head{text-align:center;font-size:10px;font-weight:900;color:#00e676;letter-spacing:1px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #1a2030}
+.sidebar-btn{background:transparent;border:none;color:rgba(255,255,255,0.5);font-weight:800;padding:6px;margin:2px 0;border-radius:6px;cursor:pointer;width:46px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-family:inherit}
+.sidebar-btn:not(.empty):hover{background:rgba(0,230,118,0.1);color:#00e676}
+.sidebar-btn.empty{opacity:0.15;cursor:default}
+
+/* Search panel */
+.search-panel{position:fixed;right:12px;top:12px;width:280px;height:calc(100vh - 24px);background:#0f1420;border:1px solid #1a2030;padding:14px;border-radius:8px;display:flex;flex-direction:column;gap:10px;z-index:100}
+.search-input{width:100%;padding:10px 14px;border-radius:8px;border:1px solid #1a2030;background:#0a0e18;color:#fff;font-size:13px;font-family:inherit;outline:none}
+.search-input:focus{border-color:#00e676}
+.tool-row{display:flex;gap:6px}
+.tool-btn{flex:1;padding:8px;border-radius:6px;border:1px solid #1a2030;background:#0a0e18;color:#00e676;font-weight:700;font-size:11px;cursor:pointer;font-family:inherit}
+.tool-btn:hover{background:rgba(0,230,118,0.1)}
+.search-results{flex:1;overflow-y:auto;border-top:1px solid #1a2030;padding-top:8px}
+.search-results::-webkit-scrollbar{width:4px}
+.search-results::-webkit-scrollbar-thumb{background:#1a2030}
+.search-item{padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;color:rgba(255,255,255,0.7)}
+.search-item:hover{background:rgba(0,230,118,0.1);color:#00e676}
+
+/* Main */
+.main{margin-left:88px;margin-right:304px;padding:20px 28px}
+.header{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid #1a2030}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#00e676,#69f0ae);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#04070d;font-family:Arial,sans-serif}
+.title-wrap{flex:1}
+.title{font-size:24px;font-weight:800;color:#fff}
+.subtitle{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid #1a2030;background:#0f1420;color:rgba(255,255,255,0.6);font-size:16px;cursor:pointer;font-family:inherit}
+.icon-btn:hover{border-color:#00e676;color:#00e676}
+
+/* XP Card */
+.xp-card{display:flex;align-items:center;gap:14px;padding:14px 18px;margin-bottom:20px;background:#0f1420;border:1px solid #1a2030;border-radius:10px}
+.xp-pfp{width:48px;height:48px;border-radius:50%;border:2px solid #00e676;cursor:pointer;object-fit:cover}
+.xp-info-wrap{flex:1}
+.xp-info{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.xp-level{color:#00e676;font-weight:700}
+.xp-text{color:rgba(255,255,255,0.5)}
+.xp-bar{width:100%;height:8px;background:#0a0e18;border-radius:4px;overflow:hidden;border:1px solid #1a2030}
+.xp-fill{height:100%;background:#00e676;width:0%;transition:width .3s}
+
+/* Sections */
+.section{margin-bottom:20px}
+.pinned,.recent{padding:14px 18px;border-radius:10px;margin-bottom:16px}
+.pinned{background:#1a1500;border:1px solid #332900}
+.recent{background:#001a0d;border:1px solid #003319}
+.section-head{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pinned .section-head{color:#ffd740}
+.recent .section-head{color:#00e676}
+.section-count{font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5)}
+.cards{display:flex;gap:8px;flex-wrap:wrap}
+.pin-card,.rec-card{padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;font-family:inherit}
+.pin-card{background:#332900;border:1px solid #664d00}
+.pin-card:hover{background:#4d6600;color:#ffd740}
+.rec-card{background:#003319;border:1px solid #006633}
+.rec-card:hover{background:#004d26;color:#00e676}
+.unpin{background:none;border:none;color:rgba(255,215,64,0.5);cursor:pointer;font-size:13px;padding:0;font-family:inherit}
+.unpin:hover{color:#ffd740}
+.empty{color:rgba(255,255,255,0.3);font-size:12px;font-style:italic}
+
+/* Letter sections */
+.letter{background:#0f1420;border:1px solid #1a2030;border-left:3px solid #00e676;padding:14px 18px;border-radius:8px;margin-bottom:14px}
+.letter-head{font-size:20px;font-weight:900;color:#00e676;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.letter-count{font-size:10px;padding:3px 8px;border-radius:8px;background:rgba(0,230,118,0.1);color:#69f0ae;font-weight:700}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.game-row{display:flex;gap:4px;align-items:center}
+.game-btn{flex:1;background:transparent;border:1px solid #1a2030;padding:9px 12px;border-radius:6px;color:rgba(255,255,255,0.7);font-weight:600;text-align:left;cursor:pointer;font-size:12px;font-family:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-btn:hover{background:rgba(0,230,118,0.08);color:#00e676;border-color:#00e676}
+.dl-btn,.pin-btn{width:30px;height:34px;border-radius:6px;border:1px solid #1a2030;background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-size:12px;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.dl-btn:hover{border-color:#00e676;color:#00e676}
+.pin-btn{border-color:rgba(255,215,64,0.15);color:rgba(255,215,64,0.5)}
+.pin-btn:hover{color:#ffd740;border-color:#ffd740}
+.pin-btn.pinned{color:#ffd740;border-color:#ffd740;background:rgba(255,215,64,0.1)}
+
+/* Settings */
+.settings{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;display:none;align-items:center;justify-content:center}
+.settings.open{display:flex}
+.settings-modal{background:#0f1420;border:1px solid #1a2030;border-radius:12px;padding:24px;width:460px;max-width:92%}
+.settings-modal h3{margin:0 0 18px;color:#00e676;font-size:16px}
+.settings-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px}
+.settings-input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #1a2030;background:#0a0e18;color:#fff;font-size:13px;font-family:inherit;outline:none}
+.settings-input:focus{border-color:#00e676}
+.settings-row{display:flex;gap:8px;margin-top:18px}
+.settings-btn{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+.settings-btn.save{background:#00e676;color:#04070d}
+.settings-btn.reset{background:rgba(255,82,82,0.15);color:#ff5252;border:1px solid rgba(255,82,82,0.3)}
+.settings-btn.close{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);border:1px solid #1a2030}
+.settings-saved{font-size:12px;color:#00e676;margin-top:10px;text-align:center;display:none;font-weight:700}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:#0f1420;border:1px solid #00e676;padding:12px 20px;border-radius:8px;color:#00e676;font-weight:700;font-size:13px;z-index:99999;opacity:0;transition:opacity .3s,transform .3s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:980px){
+  .search-panel{display:none}
+  .main{margin-right:16px;margin-left:84px;padding:14px}
+  .sidebar{width:56px}
+  .games-grid{grid-template-columns:1fr}
+  .g-logo{font-size:60px}
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2)}
+::-webkit-scrollbar-thumb{background:rgba(0,230,118,0.3);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- GOOGLE FAKE -->
+<div id="gpage">
+  <div class="g-header">
+    <a href="#" onclick="return false">Gmail</a>
+    <a href="#" onclick="return false">Imagens</a>
+    <div class="g-avatar">A</div>
+  </div>
+  <div class="g-main">
+    <div class="g-logo"><span class="l1">G</span><span class="l2">o</span><span class="l3">o</span><span class="l4">g</span><span class="l5">l</span><span class="l6">e</span></div>
+    <div class="g-search-wrap">
+      <div class="g-search-container">
+        <svg class="g-search-icon" viewBox="0 0 24 24" fill="#9aa0a6"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" class="g-search" id="gSearchInput" placeholder="Pesquisar no Google" autocomplete="off">
+      </div>
+      <div class="g-btns">
+        <button class="g-btn" id="gSearchBtn">Pesquisa Google</button>
+        <button class="g-btn" id="gLuckyBtn">Estou com sorte</button>
+      </div>
+    </div>
+  </div>
+  <div class="g-footer">
+    <div class="g-footer-top"><span>Brasil</span></div>
+    <div class="g-footer-bot">
+      <div><a href="#" onclick="return false">Sobre</a><a href="#" onclick="return false">Publicidade</a><a href="#" onclick="return false">Negócios</a></div>
+      <div><a href="#" onclick="return false">Privacidade</a><a href="#" onclick="return false">Termos</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ANTI HISTÓRICO -->
+<div id="antiOver">
+  <div class="anti-title">ANTI HISTÓRICO</div>
+  <div class="anti-sub">SISTEMA INICIADO</div>
+  <div class="anti-status" id="antiStatus">CARREGANDO...</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SITE -->
+<div id="deepg">
+  <div class="sidebar" id="sidebar"><div class="sidebar-head">A-Z</div></div>
+
+  <div class="search-panel">
+    <input class="search-input" id="searchBox" placeholder="Buscar jogos..." autocomplete="off">
+    <div class="tool-row">
+      <button class="tool-btn" onclick="disguiseSite()">Disfarçar</button>
+      <button class="tool-btn" onclick="hideSite()">Esconder</button>
+    </div>
+    <div class="tool-row">
+      <button class="tool-btn" onclick="downloadSite()">Baixar</button>
+      <button class="tool-btn" onclick="cloneSite()">Clonar</button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="logo">G+</div>
+      <div class="title-wrap">
+        <div class="title">Deep G+</div>
+        <div class="subtitle">1900+ jogos disponíveis</div>
+      </div>
+      <button class="icon-btn" onclick="document.getElementById('setOv').classList.add('open');populateSettings()">⚙</button>
+    </div>
+
+    <div class="xp-card">
+      <img id="levelPfp" class="xp-pfp" src="" alt="">
+      <div class="xp-info-wrap">
+        <div class="xp-info">
+          <span class="xp-level" id="levelText">Level 0</span>
+          <span class="xp-text" id="xpText">0 / 100 XP (25/jogo)</span>
+        </div>
+        <div class="xp-bar"><div id="xpFill" class="xp-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="pinned">
+        <div class="section-head">Favoritos <span class="section-count" id="pinCount">0/3</span></div>
+        <div class="cards" id="pinnedGames"><span class="empty">Nenhum jogo fixado</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="recent">
+        <div class="section-head">Recentes <span class="section-count" id="recCount">0</span></div>
+        <div class="cards" id="recentGames"><span class="empty">Nenhum jogo jogado</span></div>
+      </div>
+    </div>
+
+    <div class="section" id="sections-container"></div>
+  </div>
+
+  <div class="settings" id="setOv" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="settings-modal">
+      <h3>Configurações</h3>
+      <div class="settings-label">Disfarçar — Título</div>
+      <input class="settings-input" id="sdt" placeholder="Ex: Google">
+      <div class="settings-label">Disfarçar — Favicon URL</div>
+      <input class="settings-input" id="sdf" placeholder="https://...">
+      <div class="settings-label">Esconder — URL</div>
+      <input class="settings-input" id="shu" placeholder="https://...">
+      <div class="settings-row">
+        <button class="settings-btn save" onclick="saveSettings()">Salvar</button>
+        <button class="settings-btn reset" onclick="resetSettings()">Resetar</button>
+        <button class="settings-btn close" onclick="document.getElementById('setOv').classList.remove('open')">Fechar</button>
+      </div>
+      <div class="settings-saved" id="ssv">✓ Salvo!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var files = window.files || [
+  'cl1',
+  'cl1',
+'cl10bullets',
+'cl10minutestildawn',
+'cl12minibattles',
+'cl1on1soccer',
+'cl1v1lol',
+'cl1v1tennis',
+'cl2048',
+'cl2048cupcakes',
+'cl2doom',
+'cl2Dshooting',
+'cl3dash',
+'cl3pandas',
+'cl3pandasbrazil',
+'cl3pandasfantasy',
+'cl3pandasjapan',
+'cl3pandasnight',
+'cl3slices2',
+'cl40xescape',
+'cl4thandgoal',
+'cl500calibercontractz',
+'cl60secondsburgerrun',
+'cl60secondssantarun',
+'cl8ballclassic',
+'cl8ballpool',
+'cl9007199254740992',
+'cl99balls',
+'cl99nightsitf',
+'clabandoned3',
+'clabsolutemadness',
+'clacecombat2',
+'clacecombat3',
+'clacegangstertaxi',
+'clachievementunlocked',
+'clachievmentunlocked',
+'clachievmentunlocked2',
+'clachievmentunlocked3',
+'clachillies',
+'clachillies2',
+'clADarkRoom',
+'cladayintheoffice',
+'clADOFAI',
+'cladvancewars',
+'cladvancewars2',
+'cladventneon',
+'clAdventureCapatalist',
+'cladventurecapitalist',
+'clagariolite',
+'clageofwar',
+'clageofwar2',
+'clagesofconflict',
+'clahoysurvival',
+'clai',
+'clakoopasrevenge',
+'clakoopasrevenge2',
+'clakumanorgaiden',
+'clalienhominid',
+'clalienhominidgba',
+'clalienskyinvasion',
+'clalientransporter',
+'clalienvspredator',
+'clallbossesin1',
+'clallocation',
+'clamaze',
+'clamidstthesky',
+'clamigopancho',
+'clamigopancho2',
+'clamigopancho3',
+'clamigopancho4',
+'clamigopancho5',
+'clamigopancho6',
+'clamigopancho7',
+'clamongus',
+'clamorphous',
+'clancientsins',
+'clangry-birdsspace',
+'clangrybirds-space',
+'clangrybirds',
+'clangrybirdsshowdown',
+'clangrybirdsspace',
+'clanimalcrossingwildworld',
+'clanotherworld',
+'clapotris',
+'clappleshooter',
+'clappleworm',
+'claquaparkio',
+'clarceuslegend',
+'clarcheryworldtour',
+'clarena',
+'clarmormayhem2',
+'clarsonate',
+'clascent',
+'clasmallworldcup',
+'classesmentexaminationque',
+'clasteroids',
+'clasteroidsALT',
+'clattackhole',
+'clavalanche',
+'claviamasters',
+'claviamastersbuggy',
+'clAwesomePirates',
+'clawesomeplanes',
+'clawesometanks',
+'clawesometanks2',
+'clB3313',
+'clbabeltower',
+'clbabychiccoadventure',
+'clbabykaizo',
+'clbabysniperinvietnam',
+'clbackrooms',
+'clbackrooms2D',
+'clbackyardbaseball',
+'clbackyardbaseball09',
+'clbackyardbaseball10',
+'clbackyardsoccer',
+'clbaconmaydie',
+'clbadbodyguards',
+'clbadicecream',
+'clbadmondaysimulator',
+'clbadparenting',
+'clbadpiggies',
+'clbadtimesim',
+'clbadtimesimulator',
+'clbaldidecomp',
+'clbaldisbasics',
+'clbaldisbasicsremaster',
+'clbaldisfunnewschoolultimate',
+'clballblast',
+'clballsandbricks',
+'clballsandbricksgood',
+'clbananasimulator',
+'clbanditgunslingers',
+'clbanjokazooie',
+'clbanjotooie',
+'clbankbreakout2',
+'clbankrobbery2',
+'clbarryhasasecret',
+'clbas',
+'clbaseballbros',
+'clbasketballfrvr',
+'clbasketballlegends',
+'clbasketballstars',
+'clbasketbattle',
+'clbasketbros',
+'clbasketrandom',
+'clbasketrandomgood',
+'clbasketslamdunk2',
+'clbatterup',
+'clbattlekarts',
+'clbattles',
+'clbattlesim',
+'clbattlezone',
+'clbazookaboy',
+'clbballlegend',
+'clbeachboxingsim',
+'clbeamrider',
+'clbearbarians',
+'clbearsus',
+'clben10alienforce',
+'clben10omniverse',
+'clben10protector',
+'clben10racing',
+'clben10ultimatealien',
+'clbergentruck201x',
+'clbfdia5b',
+'clbigicetowertinysquare',
+'clbigneontowertinysquare',
+'clbigshotboxing2',
+'clbigtowertinysquare',
+'clbigtowertinysquare2',
+'clbigtowertinysquare2good',
+'clBig_Time_Butter_Baron',
+'clbindingofisaccsheeptime',
+'clbioevil4',
+'clbitlife',
+'clbitlifeencrypted',
+'clbitplanes',
+'clblackjack',
+'clblackjackbattle',
+'clblackjackhhhh',
+'clblacksmithlab',
+'clblastronaut',
+'clblazedrifter',
+'clbleachvsnaruto',
+'clblightborne',
+'clblobsstory2',
+'clblockblast',
+'clblockcraftparkour',
+'clblockcraftshooter',
+'clblockpost',
+'clblockthepig',
+'clblockydemolitionderby',
+'clblockysnakes',
+'clbloodmoney',
+'clbloodtournament',
+'clbloons',
+'clbloons2',
+'clbloonspp1',
+'clbloonspp2',
+'clbloonspp3',
+'clbloonspp4',
+'clbloonspp5',
+'clbloonspp6',
+'clbloonsTD1',
+'clbloonsTD2',
+'clbloonsTD3',
+'clbloonsTD4',
+'clbloonsTD5',
+'clbloonsTD6scratch',
+'clbloxorz',
+'clblumgiracers',
+'clBMX2',
+'clbntts',
+'clbobtherobber',
+'clbobtherobber2',
+'clbobtherobber5',
+'clbollybeat',
+'clbomberman',
+'clbomberman2',
+'clbombermanhero',
+'clboomslingers',
+'clbottlecracks',
+'clbottleflip3d',
+'clbounceback',
+'clbouncemasters',
+'clbouncymotors',
+'clBountyOfOne',
+'clbowlalt',
+'clboxhead2playrooms',
+'clboxheadnightmare',
+'clboxinglive-2',
+'clboxinglive2',
+'clboxingrandom',
+'clbrainrot',
+'clbridgerace',
+'clBTD1',
+'clbtd5',
+'clbtts',
+'clbtts2',
+'clbubbleshooter',
+'clbubbleshooterpirate',
+'clbubbletanks',
+'clbubbletanks2',
+'clbubbletanks3',
+'clbubbletanksarenas',
+'clbubbletankstd',
+'clbubsy',
+'clbuckshotroulette',
+'clbuildnowgg',
+'clbunnyland',
+'clburgerandfrights',
+'clburritobison',
+'clburritobison2',
+'clburritobisonlaunchalibre',
+'clburritobisonrevenge',
+'clbushidoblade',
+'clcactusmccoy',
+'clcactusmccoy2',
+'clcannonballs3d',
+'clcannonfodder',
+'clcapybaraclicker',
+'clcarcrash3',
+'clcardrawing',
+'clcareatscar2deluxe',
+'clcarkingarena',
+'clcarmods',
+'clcarstuntsdriving',
+'clCartoonNetworkTableTennisUltimateTournament',
+'clcastlebloodline',
+'clcastlecircleofmoon',
+'clcastlevania',
+'clcastlevania2',
+'clcastlevania3',
+'clcastlevaniaariaofsorrow',
+'clcastlevaniadawnofsorrow',
+'clcastlevanianes',
+'clcastlewarsmodern',
+'clcatmario',
+'clcatmariogood',
+'clcatslovecake2',
+'clcavestory',
+'clceleste',
+'clceleste2',
+'clcellardoor',
+'clchaosfaction2',
+'clcheckers',
+'clcheesechompers3d',
+'clcheshireinachatroom',
+'clchess',
+'clchessclassic',
+'clchibiknight',
+'clchickenscream',
+'clchickenwar',
+'clchipschallenge',
+'clchoppyorc',
+'clchronotrigger',
+'clchuzzle',
+'clCircloO2',
+'clciviballs',
+'clciviballs2',
+'clclashofvikings',
+'clclassof09',
+'clcleanupio',
+'clclearvision',
+'clclearvision2',
+'clclearvision3',
+'clclearvision4',
+'clclearvision5',
+'clclmadnessambulation',
+'clclubbytheseal',
+'clclusterrush',
+'clcoalllcdemo',
+'clcod4',
+'clcodblackopp',
+'clcoddefiance',
+'clcodenamegordon',
+'clcodmodernwarfare',
+'clcodworldatwar',
+'clcoffeemaker',
+'clcolorburst3d',
+'clcolormatch',
+'clcolorwatersort3d',
+'clcombopool',
+'clcommanderkeen4',
+'clcommanderkeen5',
+'clcommanderkeen6',
+'clconkersbadfurday',
+'clcontra',
+'clcontra3',
+'clcookie-clicker',
+'clcookieclicker',
+'clcookieclickercool',
+'clcookieclickergood',
+'clcookingmama',
+'clcookingmama2',
+'clcookingmama3',
+'clcoreball',
+'clcotlk',
+'clcountmastersstickmangames',
+'clcoverorange',
+'clcoverorange2',
+'clcoverorangejourneygangsters',
+'clcoverorangejourneyknights',
+'clcoverorangejourneypirates',
+'clcoverorangejourneyspace',
+'clcoverorangeplayerspack',
+'clcoverorangeplayerspack2',
+'clcoverorangeplayerspack3',
+'clcrankit!',
+'clcrashbandicoot',
+'clcrashbandicoot2',
+'clcrashteamracing',
+'clcrazycars',
+'clcrazycattle3d',
+'clcrazychicken3D',
+'clcrazyfrogracer',
+'clcrazymotorcycle',
+'clcreeperworld2',
+'clcrossyroad',
+'clcrunchball3000',
+'clcs1.6',
+'clcsds',
+'clcsgoclicker',
+'clctgpnitro',
+'clcurveball',
+'clcuttherope',
+'clcuttheropetimetravel',
+'clcyberbungracing',
+'clcybersensation',
+'cldadgame',
+'cldadnme',
+'cldaggerfall',
+'cldanktomb',
+'cldborigins',
+'cldborigins2',
+'cldbsniper',
+'cldbzattacksaiyans',
+'cldbzdevolution',
+'cldbzsuperwarriorssonic',
+'cldeadestate',
+'cldeadlydescent',
+'cldeadplate',
+'cldeadzed',
+'cldeadzed2',
+'cldeathchase',
+'cldeblob2',
+'cldecision',
+'cldecision2',
+'cldecision3',
+'cldecisionmedieval',
+'cldeepersleep',
+'cldeepestsword',
+'cldeepsleep',
+'cldefendyourcastle',
+'cldefendyournuts',
+'cldefendyournuts2',
+'cldeltarune',
+'cldeltatraveler',
+'cldementium',
+'cldemolitionderbycrashracing',
+'cldiablo',
+'cldiamondhollow',
+'cldiamondhollow2',
+'cldiddykong-racing',
+'cldieinthedungeon',
+'cldigdeep',
+'cldigdug',
+'cldigdug2',
+'cldigdug26',
+'cldigtochina',
+'cldinodudes',
+'cldiredecks',
+'cldoblox',
+'cldogeminer',
+'cldogeminer2',
+'cldokidokiliteratureclub',
+'cldonkeykong',
+'cldonkeykong64',
+'cldonkeykongcountry',
+'cldonkeykongcountry2',
+'cldonkeykongcountry3',
+'cldonkeykongnes',
+'cldontescape',
+'cldontescape2',
+'cldontescape3',
+'cldoodlejump',
+'cldoodlejumpgoober',
+'cldoom',
+'cldoom2',
+'cldoom2d',
+'cldoom2dDOS',
+'cldoom3pack',
+'cldoom64',
+'cldoomdos',
+'cldoomemscripten',
+'cldoomps',
+'cldoompsalt',
+'cldoomzio',
+'cldouchebaglife',
+'cldouchebagworkout',
+'cldownthemountain',
+'cldragonballadvance',
+'clDragonBallZTheLegacyofGoku',
+'clDragonQuestIX',
+'cldrawclimber',
+'cldrawtheline',
+'cldreader',
+'cldreadheadparkour',
+'cldriftboss',
+'cldrifthuntersmerge',
+'cldrivemady',
+'cldrivenwild',
+'cldrmario',
+'cldrweedgaster',
+'cldubstep',
+'clduckhunt',
+'clducklfe5',
+'clducklife',
+'clducklife2',
+'clducklife3',
+'clducklife4',
+'clducklifebattle',
+'clducklifespace',
+'clducklingsio',
+'clducktales',
+'cldud',
+'cldukenukem3d',
+'cldumpling',
+'cldungeondeck',
+'cldungeonraid',
+'cldungeonsanddegenerategamblers',
+'cldunkshot',
+'clduskchild',
+'cldyingdreams',
+'cldynamiteheaddy',
+'cleagleride',
+'clearntodie',
+'clearntodie2',
+'clearthbound',
+'clearthbound3',
+'clearthboundsnes',
+'clearthtaken',
+'clearthtaken2',
+'clearthtaken3',
+'clearthwormjim',
+'clearthwormjim2',
+'cledelweiss',
+'cledyscarsimulator',
+'cleffinghail',
+'cleffingmachines',
+'cleffingworms',
+'cleffingzombies',
+'clegg',
+'cleggycar',
+'clelasticface',
+'clelectricman2',
+'clemujs',
+'clenchain',
+'clendlesswar4',
+'clendlesswar5',
+'clendlesswar5wow',
+'clendlesswar7',
+'clenduro',
+'clepicbattlefantasy5',
+'clescalatingduel',
+'clescaperoad-2',
+'clescaperoad',
+'clet',
+'cletrianoddyssey',
+'clevilglitch',
+'clevolution',
+'clexcitebike64',
+'clextremerun3d',
+'clfactoryballs',
+'clfactoryballs2',
+'clfactoryballs3',
+'clfactoryballs4',
+'clfairytalevsonepiece',
+'clfallout',
+'clfamidash',
+'clfancypantsadventure',
+'clfancypantsadventure2',
+'clfancypantsadventure3',
+'clfancysnowboarding',
+'clfashionbattle',
+'clfattygenius',
+'clfearstofathomhomealone',
+'clfeedus',
+'clfeedus2',
+'clfeedus3',
+'clfeedus4',
+'clfeedus5',
+'clFF3',
+'clff6',
+'clffmysticquest',
+'clFFsonic1',
+'clFFsonic2',
+'clFFsonic3',
+'clFFsonic4',
+'clFFsonic5',
+'clFFsonic61',
+'clFFsonic62',
+'clFIFA07',
+'clFIFA10',
+'clFIFA11',
+'clFIFA2000(1)',
+'clfifa2000',
+'clFIFA99',
+'clFIFAinternationalsoccer',
+'clFIFAroadtoworldcup98',
+'clFIFAsoccer06',
+'clFIFAsoccer95',
+'clFIFAsoccer96',
+'clFIFAsoccer97',
+'clFIFAstreet2',
+'clfinalearth2',
+'clfinalfantasy',
+'clfinalfantasyII',
+'clfinalfantasytactics',
+'clfinalfantasyVI',
+'clfinalfantasyVII',
+'clfinalfantasyVIId2',
+'clfinalfantasyVIId3',
+'clfinalfantasyVIItheothertetrr',
+'clfinalninja',
+'clfireblob',
+'clfireboyandwatergirl',
+'clfireboyandwatergirl2',
+'clfireboyandwatergirl3',
+'clfireboyandwatergirl5',
+'clfireboyandwatergirl6',
+'clfireemblem',
+'clfisheatgettingbig',
+'clfisquarium',
+'clfivenightsatbaldisredone',
+'clfivenightsatshrekshotel',
+'clflashsonic',
+'clfloodrunner',
+'clfloodrunner2',
+'clfloodrunner4',
+'clfluidism',
+'clfnac1',
+'clfnac2',
+'clFNAF',
+'clFNAF2',
+'clFNAF3',
+'clFNAF4',
+'clfnaf4halloween',
+'clfnafanimatronics',
+'clfnafps',
+'clfnafsl',
+'clfnafucn',
+'clfnafworldd',
+'clfnfagoti',
+'clfnfbfdi26',
+'clfnfblackbetrayal',
+'clfnfbside',
+'clfnfcamelliarudeblaster',
+'clfnfcrunchin',
+'clfnfdesolation',
+'clfnfdokitakeoverplus',
+'clfnfdropandroll',
+'clfnfdustin',
+'clfnffleetway',
+'clfnffnaf3',
+'clfnfgamebreakerbundle',
+'clfnfgoldenapple',
+'clfnfhex',
+'clfnfholiday',
+'clfnfhorkglorpgloop',
+'clfnfhypnoslullaby',
+'clfnfimposterv4',
+'clfnfindiecross',
+'clfnfmadnesspoop',
+'clfnfmariomadnessdside',
+'clfnfmidfight',
+'clfnfmiku',
+'clfnfmobmod',
+'clfnfneo',
+'clfnfpiggyfield',
+'clfnfpokepastaperdition',
+'clfnfqt',
+'clfnfrevmixed',
+'clfnfrewrite',
+'clfnfselfpaced',
+'clfnfshaggy4keys',
+'clfnfshaggyxmatt',
+'clfnfshucks-v2',
+'clfnfshucksv2',
+'clfnfsky',
+'clfnfsoft',
+'clfnfsonicexe',
+'clfnfsonicexe4',
+'clfnftailsgetstrolled',
+'clfnftricky',
+'clfnfwednesday-infedility',
+'clfnfwhitty',
+'clfnfzardy',
+'clfocus',
+'clfolderdungeon',
+'clfootballbros',
+'clfootballlegends',
+'clforknsausage',
+'clfortzone',
+'clfpa4p1',
+'clfpa4p2',
+'clfreegemas',
+'clfreerider',
+'clfreerider2',
+'clfreerider3',
+'clfridaynightfunkin',
+'clfromrusttoash',
+'clfruitninja',
+'clfunnybattle',
+'clfunnybattle2',
+'clfunnymadracing',
+'clfunnyshooter2',
+'clfunnyshooter22',
+'clfzero',
+'clfzerox',
+'clgalaga',
+'clgameandwatchcollection',
+'clgangstabean',
+'clgangstabean2',
+'clgangsterbros',
+'clgarcello',
+'clgdlite',
+'clgdsubzero',
+'clgeneralchaos',
+'clgenericfightermaybe',
+'clgeometrydashscratch',
+'clgeometryvibes',
+'clgeorgeandtheprinter',
+'clgetawayshootout',
+'clgetontop',
+'clGettothetopalthoughthereisnotop',
+'clgetyoked',
+'clghosttrick',
+'clgimmietheairpod',
+'clgladdihoppers',
+'clgloryhunters',
+'clglover',
+'clgoalsouthafrica',
+'clgobble',
+'clgoingballs',
+'clgolddiggerfrvr',
+'clgoldeneye007',
+'clgoldensun',
+'clgoldensunnds',
+'clGoldenSunTheLostAge',
+'clgoldminer',
+'clgolforbit',
+'clgolfsunday',
+'clgoodbigtowertinysquare',
+'clgoodbigtowertinysquare2',
+'clgoodboygalaxy',
+'clgoodmonkeymart',
+'clgooglebaseball',
+'clgoogledino',
+'clgorescriptclassic',
+'clgrandactionsimulator-ny',
+'clgranddad',
+'clgrandtheftautoadvance',
+'clgranny',
+'clgranny2',
+'clgranny22',
+'clgranny3',
+'clgranturismo',
+'clgranturismo2',
+'clgrassmowing',
+'clgravity',
+'clgravitymod',
+'clgrey-box-testing',
+'clgrimacebirthday',
+'clgrindcraft',
+'clgrn',
+'clgrowagarden',
+'clgrowdenio',
+'clgrowyourgarden',
+'clgta',
+'clgta2',
+'clgta22',
+'clgta2alt',
+'clgtaalt',
+'clgtaalty',
+'clgtachina',
+'clguesstheiranswer',
+'clgun-spin',
+'clgunblood',
+'clguncho',
+'clgunknight',
+'clgunmayhem',
+'clgunmayhem2',
+'clgunmayhem2goof',
+'clgunmayhemredux',
+'clgunnight',
+'clgunsmoke',
+'clgymstack',
+'clhacx',
+'clhajimeippo',
+'clhalflife',
+'clhalocombatdevolved',
+'clhandshakes',
+'clhandsofwar (1)',
+'clhandsofwar(1)',
+'clhandsofwar(2)',
+'clhandsofwar',
+'clhandulum',
+'clhanger2',
+'clhappyroom',
+'clhappywheels',
+'clhardwaretycoon',
+'clHaroldsbadday',
+'clharvestio',
+'clharvestmoon',
+'clharvestmoon64',
+'clhauntthehouse',
+'clheartandsoul',
+'clhei$t',
+'clhelixjump',
+'clhellron',
+'clhelpnobrakes',
+'clhero3flyingrobot',
+'clhextris',
+'clhighstakes',
+'clhighwayracer2',
+'clhighwaytraffic3d',
+'clhillclimbracinglite',
+'clHiNoHomo',
+'clhipsterkickball',
+'clhit8ox',
+'clhitsinglereal',
+'clhl2doom',
+'clhobo',
+'clhobo2',
+'clhobo3',
+'clhobo4',
+'clhobo5',
+'clhobo6',
+'clhobo7',
+'clhobovszombies',
+'clholeio',
+'clhollowknight',
+'clhouseofhazards',
+'clhoverracerdrive',
+'clhumanexpenditureprogram',
+'clhungryknight',
+'clhungrylamu',
+'clhyppersandbox',
+'clicantbelievegoogleflaggedmeforthenameofthefilelol',
+'clice age baby',
+'clicedodo',
+'clicypurplehead',
+'clidlebreakout',
+'clidledice',
+'clidleidlegamedev',
+'clidleminertycoon',
+'clidleminorzamnshes12',
+'climpossiblequiz (1)',
+'climpossiblequiz',
+'climpossiblequiz2',
+'clinclementemerald',
+'clindiantrucksimiulator',
+'clinfinitecraft',
+'clinkgame',
+'clinnkeeper',
+'clinsidestory',
+'clinteractivebuddy',
+'clintoruins',
+'clintospace',
+'clintospace2',
+'clintospace3',
+'clintothedeepweb',
+'clintrusion',
+'cliqball',
+'clironsnout',
+'clironsoldier',
+'cliwbtg',
+'cljacksmith',
+'cljacksmithencryptedorsmthn',
+'cljailbreakobbbobob',
+'cljefflings',
+'cljellydadhero',
+'cljellydrift',
+'cljellytruck',
+'cljellytruckgood',
+'cljetforcegemini',
+'cljetpackjoyride',
+'cljetrush',
+'cljetskiracing',
+'cljohnnytrigger',
+'cljohnnyupgrade',
+'cljourneydownhill',
+'cljsvecx',
+'clJUMP',
+'cljumpingshell',
+'cljustfalllol',
+'cljusthitthebutton',
+'cljustoneboss',
+'clkaizomarioworld',
+'clkalikan',
+'clkapi',
+'clkaratebros',
+'clkarlson',
+'clkartbros',
+'clKenGriffeyJrPresentsMajorLeagueBaseball',
+'clkillerinstinct',
+'clkillover',
+'clkilltheiceagebabyadventure',
+'clkingdomheartsdays',
+'clkingdomheartsrecoded',
+'clkingdomheartsrecodedalt',
+'clkirby64',
+'clkirbyandtheamzingmirror',
+'clkirbysadventure',
+'clkirbysdreamland',
+'clkirbysdreamland3',
+'clkirbysqueaksquad',
+'clkirbysuperstar',
+'clkirbysuperstarultra',
+'clkittencannon',
+'clklifur',
+'clknifehit',
+'clknightmaretower',
+'clkonkrio',
+'clkoopasrevenge',
+'clkourio',
+'cllaceysflashgames',
+'cllastfirered',
+'cllasthorizon',
+'cllaststand',
+'cllaststand2',
+'clleaderstrike',
+'cllearntofly',
+'cllearntofly2',
+'cllearntofly3',
+'cllearntoflyidle',
+'cllegobatman',
+'cllegobatman2superheroes',
+'cllegoindianajones',
+'cllegoindianajones2',
+'cllegoninjago',
+'cllegostarwars',
+'cllemmings',
+'clleveldevil',
+'clleverwarriors',
+'cllightitup',
+'cllilrunmo',
+'cllinerider',
+'cllinktothepast',
+'cllittlerunmo',
+'cllockthedoor',
+'clloderunner',
+'cllonewolf',
+'cllosangelesshark',
+'cllowknight',
+'clloz1',
+'cllozlinkawakening',
+'cllozminishcap',
+'cllozoracleofseasons',
+'cllozspirittracks',
+'clluckyblocks',
+'clmadalinstuntcars',
+'clmadalinstuntcarsgood',
+'clmadalinstuntcarsmultiplayerfixed',
+'clmadden93',
+'clmadden94',
+'clmadden95',
+'clmadden96',
+'clmadden99',
+'clmaddenfootball',
+'clmaddenfootball64',
+'clmaddennfl',
+'clmaddennfl2000',
+'clmaddennfl2001',
+'clmaddennfl2002',
+'clmaddy98',
+'clmadness-retaliation',
+'clmadnessaccelerant',
+'clmadnesscombatdefense',
+'clmadnesscombatnexus',
+'clmadnessgemini',
+'clmadnesshydraulic',
+'clmadnessinteractive',
+'clmadnessoffcolor',
+'clmadnesspremediation',
+'clmadnessretaliation',
+'clmadnesss2010',
+'clmadnessstand',
+'clmadskillsmotocross2',
+'clmadstick',
+'clmadstuntcars2',
+'clmagictiles3',
+'clmajorasmask',
+'clmakesureitsclosed',
+'clmanagod',
+'clmario3',
+'clmarioandluigisuperstarsaga',
+'clmariocombat',
+'clmariogolf',
+'clMarioisMissingDoneRight',
+'clmariokart64',
+'clmariokartds',
+'clmariokartsupercircuit',
+'clmariomadness',
+'clmariominusrabbids',
+'clmariopaint',
+'clmarioparty',
+'clmarioparty2',
+'clmarioparty3',
+'clmariopartyds',
+'clmariosmysterymeat',
+'clmariotennis',
+'clmaskedforcesunlimited',
+'clmastermindworldconquerer',
+'clmatrixrampage',
+'clmattv2',
+'clmcfpsfbhd',
+'clmcraerally',
+'clmeatboy',
+'clmeatboyflash',
+'clmedalofhonor',
+'clmedievalshark',
+'clmedievil',
+'clmegachess',
+'clmegaman',
+'clmegaman2',
+'clmegaman2gba',
+'clmegaman3',
+'clmegaman4',
+'clmegaman5',
+'clmegaman6',
+'clmegaman7',
+'clmegaman8',
+'clmegamanlegends',
+'clmegamanlegends2',
+'clmegamanx',
+'clmegamanx2',
+'clmegamanx3',
+'clmegamanx4',
+'clmegamanzero',
+'clmegamanzx',
+'clmegaminer',
+'clmelonplayground',
+'clmeowuwu',
+'clmergeroundracers',
+'clmetalgear',
+'clmetalgearsolid',
+'clmetalgearsolidps',
+'clmetalslugadvance',
+'clmetalslugmission1',
+'clmetalslugmission2',
+'clMetalSonicHyperdrive',
+'clmetroid',
+'clmetroid2',
+'clmetroidfusion',
+'clmetroidzeromission',
+'clmiamishark',
+'clmicromages',
+'clmightyknight',
+'clmightyknight2',
+'clmimic',
+'clmindscape',
+'clminecraft1-8-8',
+'clminecraftshooter',
+'clmineshooter',
+'clminesweeperplus',
+'clminhero',
+'clminicrossword',
+'clminimart',
+'clminishooters',
+'clminitooth',
+'clmiraginewar',
+'clmisslecommand',
+'clmk4ampedup',
+'clmmwilywars',
+'clmobcontrolhtml5',
+'clmobiusrevolution',
+'clmoneyrush',
+'clmonkeymart',
+'clmonkeymartenc',
+'clmonstertracks',
+'clmonstertruckportstunt',
+'clmortalkombat',
+'clmortalkombat2',
+'clmortalkombat3',
+'clmortalkombatadvance',
+'clmortkom4',
+'clmotherload',
+'clmotoroadrash',
+'clmotox3m2',
+'clmotox3m3',
+'clmotox3mm',
+'clmotox3mpoolparty',
+'clmotox3mspookyland',
+'clmotox3mwinter',
+'clmountainbikeracer',
+'clmrracer',
+'clmspacman',
+'clmultitask',
+'clmutilate-a-doll',
+'clmxoffroadmaster',
+'clmyfriendpedro',
+'clmyfriendpedroarena',
+'clmyteardrop',
+'cln',
+'clnarc',
+'clnaturalselection',
+'clNBAhangtime',
+'clNBAjam',
+'clnbajamTE',
+'clneonblaster',
+'clneonrider',
+'clnesworldchampion',
+'clnetattack',
+'clneverendinglegacy',
+'clnewgroundsrumble',
+'clnewsupermariobros',
+'clNewSuperMarioWorld2AroundtheWorld',
+'clnewyorkshark',
+'clnextdoor',
+'clnflblitz',
+'clnfscarbonowncity',
+'clnfsmostwanted',
+'clnfsporcheunleashed',
+'clnfsunderground',
+'clnfsunderground2',
+'clngon',
+'clnhl2002',
+'clnhlhitz2003',
+'clnickelodeonsuperbrawl2',
+'clNicktoonsFreezeFrameFrenzy',
+'clnightclubshowdown',
+'clnightfire',
+'clnightshade',
+'clnimrods',
+'clninjabrawl',
+'clnintendogslab',
+'clnintendoworldcup',
+'clnitromemustdie',
+'clnomoregameasdsadfagfggdfs',
+'clnoobminer',
+'clnotyourpawn',
+'clnplus',
+'clnubbysnumberfactory',
+'clnullkevin',
+'clNutsandBoltsScrewingPuzzle',
+'clnzp',
+'clobby-99-will-lose',
+'clobbyonlyup',
+'clobeythegame',
+'clocarinaoftime',
+'clofflineparadise',
+'clomeganuggetclicker',
+'clonebitadventure',
+'clonenightasfreddy',
+'clonepiece',
+'clonepiecefighting',
+'clonlyup',
+'cloperius',
+'cloppositeday',
+'clopposumcountry',
+'clorbofcreation',
+'clordinarysonicromhack',
+'cloregontrail',
+'clormmimastickwithclsoitcanberememberedoyeahclalienhominid',
+'closu',
+'clourpleguy',
+'clovo',
+'clovo2',
+'clovodimensions',
+'clovofixed',
+'clpacman',
+'clpacmansuperfast',
+'clpapabakeria',
+'clpapadonut',
+'clpapalouienighthunt2',
+'clpapalouiewhenburgersattack',
+'clpapalouiewhenpizzasattack',
+'clpapalouiewhensundaesattack',
+'clpapapizzagood',
+'clpapapizzagoody',
+'clpapapizzamamamia',
+'clpapasburgerIIIAAAAA',
+'clpapascheeseria',
+'clpapascupcakeria',
+'clpapasfreezeria',
+'clpapashotdoggeria',
+'clpapaspancakeria',
+'clpapaspastaria',
+'clpapasscooperia',
+'clpapassushiria',
+'clpapastacomia',
+'clpapaswingeria',
+'clpaperio',
+'clpaperio3d',
+'clpaperiomania',
+'clpapermario',
+'clpapermariopromode',
+'clpapermariottyd',
+'clparappatherapper',
+'clparappatherapperalt',
+'clparkingfury',
+'clparkingfury2',
+'clparkingfury3',
+'clparkingrush',
+'clpartnersintime',
+'clpeacekeeper',
+'clpeggle',
+'clpenaltykicks',
+'clpenguindiner',
+'clpenguinpass',
+'clpepsiman',
+'clpepsimanalt',
+'clpereelous',
+'clperfectdark',
+'clperfecthotel',
+'clpersona',
+'clpersona2',
+'clpersona2alt',
+'clpersonaalt',
+'clphasma',
+'clpheonixjusticeforall',
+'clpheonixrightaceattorny',
+'clpheonixtrialsandyear',
+'clpheonixtrialsandyeartrhfasd',
+'clpibbyapocalypse',
+'clpico8',
+'clpico8edu',
+'clpicodriller',
+'clpicohot',
+'clpicolife',
+'clpiconightpunkin',
+'clpicosschool',
+'clpicovsbeardx',
+'clpiecesofcake',
+'clpikwip',
+'clpingpongchaos',
+'clpinkbike',
+'clpitfall',
+'clpitof100trials',
+'clpixelbattlegroundsio',
+'clpixelcombat2',
+'clpixelquestlostidols',
+'clpixelshooter',
+'clpixelspeedrun',
+'clpixelwarfare',
+'clpizzapapa',
+'clpizzatower',
+'clplangman',
+'clplantsvszombies',
+'clplazmaburst',
+'clplinko',
+'clplonky',
+'clpogo3D',
+'clpokebattlefact',
+'clpokeblack',
+'clpokeblack2',
+'clpokeblack2alt',
+'clpokeblackalt',
+'clpokeblazeblack2redux',
+'clpokeblue',
+'clpokeclassic',
+'clpokecrown',
+'clpokecrystalclear',
+'clpokediamond',
+'clpokedreamstone',
+'clpokeeliteredux',
+'clpokeelysiuma',
+'clpokeelysiumb',
+'clpokeemeraldenhanced',
+'clpokeemeraldexceeded',
+'clpokeemeraldhorizons',
+'clpokeemeraldrandom',
+'clpokefiregold',
+'clpokeflora',
+'clpokegaia',
+'clpokegschronicles',
+'clpokeheartgold',
+'clpokelightplatinum',
+'clpokeliquidcrysta',
+'clpokemegamoemon',
+'clpokemonamnesia',
+'clpokemonclover',
+'clpokemoncrystal',
+'clpokemonemerald',
+'clpokemonemeraldcrest',
+'clpokemonemeraldimperium',
+'clpokemonemeraldkaizo',
+'clpokemonemeraldmini',
+'clPokemonemeraldrouge',
+'clpokemonemeraldseaglass',
+'clpokemonenergizedemerald',
+'clpokemonevolvedsfdgsdfs',
+'clpokemonfirered',
+'clpokemonfireredandleafgreenplusedition',
+'clpokemonfireredrandomized',
+'clpokemongold',
+'clpokemonkaizoironfirered',
+'clpokemonlazarus',
+'clpokemonleafgreen',
+'clpokemonmodernemerald',
+'clpokemonmysterydungeon',
+'clpokemonquetzal',
+'clpokemonroaringred',
+'clPokemonrocketedition',
+'clpokemonruby',
+'clpokemonsapphire',
+'clpokemonshinsigma',
+'clpokemonsilver',
+'clpokemonsnap',
+'clpokemonstadium',
+'clpokemontowerdefense',
+'clpokemonultimatefusion',
+'clpokemonunbound',
+'clpokemysteryexplorersofsky',
+'clpokeodyssey',
+'clpokepearl',
+'clpokeperfectfirered',
+'clpokepisces',
+'clpokeplatinum',
+'clpokeplatinumrandomized',
+'clpokerechargedpink',
+'clpokerechargedyellow',
+'clpokerecordkeepers',
+'clpokered',
+'clpokerocketedition',
+'clpokerowe',
+'clpokeruby',
+'clpokerunandbun',
+'clpokescorchedsilver',
+'clpokesoulsilver',
+'clpokethepit',
+'clpoketourmaline',
+'clpokeultraviolet',
+'clpokeunovaemerald',
+'clpokevega',
+'clpokevoltwhite2redux',
+'clpokevoyager',
+'clpokewhite',
+'clpokewhite2',
+'clpokewhite2alt',
+'clpokeyellow',
+'clPok monstunningsteel',
+'clpolicepursuit2',
+'clpolishedcrystal',
+'clpoorbunny',
+'clpopeyepapi',
+'clporklike',
+'clportal',
+'clportal2d',
+'clportaldefendersfastbreak',
+'clportaldefendersTD',
+'clportalflash',
+'clporter',
+'clpossessquest',
+'clpostal',
+'clpotatomanseeksthetroof',
+'clpou',
+'clpraxisfighterx',
+'clprebronzeage',
+'clprecivilationbronzeage',
+'clprehistoricshark',
+'clprimary',
+'clpullfrog',
+'clpunchout',
+'clpunchthedrump',
+'clpunchthetrump',
+'clpuppethockey',
+'clpushyourluck',
+'clpuyopuyofever',
+'clpvz',
+'clpvz2',
+'clpvz2gardenless',
+'clpyrotoad',
+'clqbert',
+'clquake2',
+'clquake3',
+'clquake64',
+'clquickieworld',
+'clqwop',
+'clracemaster3d',
+'clracingarena',
+'clradicalred',
+'clradracer',
+'clraftwars',
+'clraftwars2',
+'clragdoll-io',
+'clragdollarchers',
+'clragdollhit',
+'clragdollrunners',
+'clragdollsoccer',
+'clragollhit',
+'clrainbowsix',
+'clrainbowsixalt',
+'clray1',
+'clray2',
+'clrayman',
+'clraze',
+'clraze2',
+'clraze3',
+'clre3',
+'clreachthecore',
+'clrealflightsim',
+'clrebuild',
+'clrebuild2',
+'clrecoil',
+'clredball',
+'clredball2',
+'clredball3',
+'clredball4',
+'clredball4vol2',
+'clredball4vol3',
+'clredhanded',
+'clredtierunner',
+'clredvsblue2',
+'clredvsbluewar',
+'clreignofcentipede',
+'clrenegades',
+'clresidentevil',
+'clresidentevil2',
+'clresizer',
+'clresortempire',
+'clretrobowl',
+'clretrobowlcollege',
+'clretrohighway',
+'clretropingpong',
+'clreturnman',
+'clreturnman2',
+'clreturntoriddleschool',
+'clrevolutionidle',
+'clrhythmheaven',
+'clrhythymymheaven',
+'clricochetkills2',
+'clriddlemiddleschool',
+'clriddleschool',
+'clriddleschool2',
+'clriddleschool3',
+'clriddleschool445544444$$444$444',
+'clriddletransfer',
+'clriddletransfer2',
+'clridgeracer',
+'clroadfighter',
+'clroadoffury',
+'clroadofthedead',
+'clroadofthedead2',
+'clrocketjump',
+'clrocketknightadventures',
+'clrocketleague',
+'clrocketpult',
+'clrocketsoccerderby',
+'clrodha',
+'clroguesoul',
+'clroguesoul2',
+'clrollerballer',
+'clrollingsky',
+'clrollyvortex',
+'clrolypolymonster',
+'clrooftopsnipers',
+'clrooftopsnipers2',
+'clroomclicker',
+'clrotate',
+'clrouletteknight',
+'clruffle',
+'clrun-2',
+'clrun',
+'clrun2',
+'clrun3',
+'clrussiancardriver',
+'clsandboxcity',
+'clsandboxels',
+'clsandsofthecoliseum',
+'clsandtris',
+'clsantarun',
+'clsaszombieassault2',
+'clsaulgoodmanrun',
+'clscarletshift',
+'clscarymazegame',
+'clscrapmetal3',
+'clscrapyarddog',
+'clscribblenauts',
+'clscubabear',
+'clseamongrel',
+'clsecretofmana',
+'clsega2gg',
+'clsentryfortress',
+'clserenitrove',
+'clservingupmadness',
+'clsfk',
+'clsfk2',
+'clsfklaststand',
+'clsfkleague',
+'clshaggy',
+'clshc1',
+'clshc2',
+'clshc3',
+'clshift',
+'clshift2',
+'clshift3',
+'clshinmegamitenseidevilsurvivor',
+'clshortlife',
+'clshredmill',
+'clshrek-2',
+'clshrubnaut',
+'clshwultimatem',
+'clsideeffects',
+'clsidepocket',
+'clsierra7',
+'clsilenthill',
+'clsilenthillalt',
+'clsilk',
+'clsiloshowdow',
+
+'clsixwaystodie',
+'clskateit',
+'clskibidiinthebackrooms',
+'clskibidishooter',
+'clskong',
+'clskyrace-3d',
+'clsliceitall',
+'clslideinthewoods',
+'clslimelabratory',
+'clslipways',
+'clslitherio',
+'clslope',
+'clslope2player',
+'clslope3',
+'clslopeplus',
+'clslotornot',
+'clslowroads',
+'clsm63redux',
+'clsmadvance2',
+'clsmadvance3',
+'clsmashkarts',
+'clsmashkartsworking',
+'clsmashremix',
+'clsmbc',
+'clsmbcrossover',
+'clsmbgameover',
+'clsnailbob',
+'clsnailbob2',
+'clsnailbob3',
+'clsnailbob4space',
+'clsnailbob5lovestory',
+'clsnakeis',
+'clsnakelike',
+'clsnipershot',
+'clsniperv2',
+'clsnowballio',
+'clsnowrid',
+'clsnowrideee',
+'clsnowrider',
+'clsnowridergoodygumdrops',
+'clsnowriderrrr',
+'clsnowroad',
+'clsoccerbros',
+'clsoccerrandom',
+'clsoccerrandomgood',
+'clsolarsandbox',
+'clsolarsmash',
+'clsolitaire',
+'clsonic1contemporary',
+'clSonic1ScoreRush',
+'clSonic2ScoreRush',
+'clsonic3andknuckles',
+'clsonic3complete',
+'clsonic3dblastdx',
+'clsonicadvance',
+'clsonicadvance2',
+'clsonicadvance2sp',
+'clsonicadvance3',
+'clsonicandashuro',
+'clsonicandknuckles',
+'clsonicbattle',
+'clsoniccd',
+'clsonicclassiccollection',
+'clsonicclassicheroes',
+'clsoniccolors',
+'clsonicdeltaorigins',
+'clsoniceexeog',
+'clsonicerazor',
+'clsonicgg',
+'clSonicHellfireSaga',
+'clsonicjam',
+'clsonicmegamix',
+'clsonicr',
+'clsonicralt',
+'clsonicrevert',
+'clsonicrush',
+'clsonicrushadventure',
+'clsonicspinball',
+'clsonicthehedgehog',
+'clsonicthehedgehog2',
+'clsonicthehedgehog3',
+'clsonny2',
+'clsouljumper',
+'clspacebarclicker',
+'clspacecompany',
+'clspaceinvaders',
+'clspaceiskey',
+'clspaceiskey2',
+'clspaceiskeyxmas',
+'clspacewarsbattleground',
+'clspacewaves',
+'clspeedperclick',
+'clspeedstars',
+'clspewer',
+'clspiralroll',
+'clsprunked',
+'clsprunki',
+'clsprunkiclicker',
+'clsquidplayground',
+'clstackballio',
+'clstacktris',
+'clstackydash',
+'clstarfox',
+'clstarfox64',
+'clstarraiders',
+'clstateio',
+'clstation141',
+'clstationmeltdown',
+'clstationsaturn',
+'clsteakandjake',
+'clstealbrainrotonline',
+'clstealthassassin',
+'clstealthmaster',
+'clsteelempire',
+'clsteelsurge',
+'clstickarchersbattle',
+'clstickfighter',
+'clstickjetchallenge',
+'clstickmanandguns',
+'clstickmanclash',
+'clstickmanduel',
+'clstickmangtacity',
+'clstickmanhook',
+'clStickmanKingdomclash',
+'clstickmankombat2d',
+'clstickmanstealingdiamond',
+'clstickmerge',
+'clstickminairship',
+'clstickminbreakingbank',
+'clstickminescapingprison',
+'clstickminfleecomplex',
+'clstickrpgcomplete',
+'clstickslasher',
+'clstickwar',
+'clstickwar2',
+'clstormthehouse',
+'clstormthehouse3',
+'clstrangejournet',
+'clstreangeropepolice',
+'clstreetfighter2',
+'clstreetfighter2turbo',
+'clstreetfighteralpha3',
+'clstreetfighterumuhsomething',
+'clstreetofrage',
+'clstreetofrage2',
+'clstreetofrage3',
+'clstrikeforceheroes',
+'clstrikeforceheroes2',
+'clstrikeforceheroes3',
+'clstrikerdummies',
+'clstylesavvy',
+'clsubwaysurfersbarcelona',
+'clsubwaysurfersbeijing',
+'clsubwaysurfersberlin',
+'clsubwaysurfersbuenosaires',
+'clsubwaysurfershavana',
+'clsubwaysurfershouston',
+'clsubwaysurfersiceland',
+'clsubwaysurferslondon',
+'clsubwaysurfersmexico',
+'clsubwaysurfersmiami',
+'clsubwaysurfersmonaco',
+'clsubwaysurfersneworeleans',
+'clsubwaysurfersneworleans',
+'clsubwaysurferssanfrancisco (1)',
+'clsubwaysurferssanfrancisco(1)',
+'clsubwaysurferssanfrancisco',
+'clsubwaysurfersstpetersburg',
+'clsubwaysurferswinterholiday',
+'clsubwaysurferszurich',
+'clsugarsugar',
+'clsuika',
+'clsuikapico',
+'clsunandmoon',
+'clsuperbomberman',
+'clsuperbomberman2',
+'clsuperbomberman3',
+'clsuperbomberman4',
+'clsuperbomberman5',
+'clsupercarrush',
+'clsupercastlevaniaVI',
+'clsuperchibiknight',
+'clsupercold',
+'clsuperdarkdeception',
+'clsuperdiagonalmario2',
+'clsuperfighters',
+'clsuperhot',
+'clsuperhotlinemiami',
+'clsuperhouseofdeadninjas',
+'clsuperislandadventure',
+'clsuperkidadventure',
+'clsuperliquidsoccer',
+'clsupermario',
+'clsupermario63',
+'clsupermario64',
+'clsupermario64ds',
+'clsupermarioallstars',
+'clsupermariobros',
+'clsupermariobros2',
+'clsupermariobros2us',
+'clsupermariobros3',
+'clsupermariobros3real',
+'clsupermariokart',
+'clsupermarioland',
+'clsupermarioland2',
+'clsupermariomon',
+'clsupermariorpg',
+'clsupermarioworld',
+'clsupermarioworld2',
+'clSuperMarioWorldThe SecretOfThe7GoldenStatues',
+'clsupermetroid',
+'clsupermonkeyballjr',
+'clsupernoahsark3D',
+'clsuperoliverworld',
+'clsuperpickleballadventure',
+'clsuperpunchout',
+'clsuperpuzzlefighter2turbo',
+'clsuperpuzzlefighter2turboalt',
+'clsuperscribblenauts',
+'clsupersmashbros',
+'clsupersmashflash',
+'clsupersmashflash2',
+'clsupersmashflash2butdifversion',
+'clsupertiltbros',
+'clsupitdept',
+'clsupremeduelist',
+'clsurvevio',
+'clsurvivalracev2',
+'clsushicat',
+'clsushicat2',
+'clsushiunroll',
+'clswerve',
+'clswitchblade',
+'clswordandshieldultimateplus',
+'clswordfight',
+'clswordplay',
+'clswordsandsandals',
+'clswordsandsandals2',
+'clswordsandsouls',
+'clsydneyshark',
+'cltabletanks',
+'cltabletennisworldtour',
+'cltag-',
+'cltagc3',
+'clTaikonoTatsujin',
+'cltaisei',
+'cltakeover',
+'cltallmanrun',
+'cltankmayhem',
+'cltankpixel',
+'cltanukisunset',
+'cltanukisunsetuhhhhhhhh',
+'cltapper',
+'cltaproad',
+'cltastyplanet',
+'cltboilambeternal',
+'cltecmobowl',
+'cltelephonetrouble',
+'cltelocation',
+'cltempest2000',
+'cltempleofboom',
+'cltemplerun2',
+'cltempoverdose',
+'clterra',
+'clterritorialio',
+'clterritorywar',
+'cltetris',
+'cltetrisattack',
+'cltetrisgba',
+'clthanksforremindingmeihadtofixthis',
+'cltheclassroom',
+'cltheclassroom2',
+'cltheclassroom3',
+'clthedeadseat',
+'clthedeepestsleep',
+'cltheenchantedcave2',
+'cltheimpossiblegame',
+'cltheincrediblemachine',
+'clthelaststand',
+'clthelaststandunioncity (1)',
+'clthelaststandunioncity',
+'clthemaninthewindow',
+'clthemepark',
+'clthepit',
+'clthereisnofile',
+'clthermomorph',
+'clthisistheonlylevel',
+'clthisistheonlylevel2',
+'clthisistheonlyleveltoo',
+'clthreegoblets',
+'clthrowapotato',
+'clthrowapotatoagain',
+'clthwack',
+'cltimeshooter2',
+'cltimeshooter3',
+'cltimewarriors',
+'cltinyfishing',
+'cltmnt',
+'cltoastarling',
+'cltoasterball',
+'cltombofthemass',
+'cltommorowandyesterday',
+'cltomodachicollection',
+'cltonyhawkskater2',
+'cltonyhawkskater4',
+'cltonyhawksunderground',
+'cltoomanytypes',
+'cltopspeedracing3d',
+'cltosstheturtle',
+'cltotm',
+'cltowerblocks',
+'cltowercrash3d',
+'cltownscraper',
+'cltrace',
+'cltrafficjam3d',
+'cltrapthecat',
+'cltrechoroustrials',
+'cltrechoroustrialspart2',
+'cltriachnid',
+'cltripleplay2000',
+'cltriviacrack',
+'cltrollfacequest1',
+'cltrollfacequest10',
+'cltrollfacequest11',
+'cltrollfacequest12',
+'cltrollfacequest13',
+'cltrollfacequest2',
+'cltrollfacequest3',
+'cltrollfacequest4',
+'cltrollfacequest5',
+'cltrollfacequest6',
+'cltrollfacequest7',
+'cltrollfacequest8',
+'cltrollfacequest9',
+'cltrucksim',
+'cltubejumpers',
+'cltunnelrush',
+'cltunnelrushbetter',
+'clturbostars',
+'clturokdinosaurhunter',
+'cltwinshot (1)',
+'cltwinshot(1)',
+'cltwinshot',
+'cltwistedmetal',
+'cltwistedmetal2',
+'cltwoball3d',
+'clucds',
+'cluckyblockobbyEUOPHRATESRIVER',
+'clufoswampoddysey',
+'clultimateassassian2',
+'clultimateassassian3',
+'clUltimatecardrivingsimulator',
+'clultimatemortalkombat',
+'clultimatemortalkombat3',
+'clultrakill',
+'clumstickmangameidkiforgor',
+'cluncannycatgolf',
+'clunderneath',
+'clundertaler',
+'clundertaleyellow',
+'clunfairmario',
+'clunfairmarioworkquestionmark',
+'clunfairundyne',
+'clunicyclehero',
+'cluno',
+'cluntime',
+'clupgradecomplete',
+'clupgradecomplete2',
+'clupslash',
+'clUZG',
+'clvampiresurvivors',
+'clvanguard',
+'clvaportrails',
+'clvex',
+'clvex2',
+'clvex3',
+'clvex3xmas',
+'clvex4',
+'clvex5',
+'clvex6',
+'clvex7',
+'clvex8',
+'clvexchallenges',
+'clvexx3m',
+'clvexx3m2',
+'clvillager',
+'clvincentmansionofthedead',
+'clvisitor',
+'clvolleyrandom',
+'clvollyballchallenge',
+'clvvvvvv',
+'clwaluigitacostand',
+'clwarfare1944',
+'clwarioland4',
+'clwariowarediy',
+'clwariowareinc',
+'clwartheknight',
+'clwaterpoolio',
+'clwavedash',
+'clwaverace64',
+'clwaverun',
+'clwebecomewhatwebehold',
+'clwebfishing',
+'clweltling',
+'clwermhole',
+'clwhackthetheif',
+'clwhackyourboss',
+'clwhackyourcomputer',
+'clwheeliebike',
+'clwheely',
+'clwheely2',
+'clwheely3',
+'clwheely4',
+'clwheely5',
+'clwheely6',
+'clwheely7',
+'clwheely8',
+'clwindowsdoors',
+'clwinterfalling',
+'clwipeout2097',
+'clwipeout2097alt',
+'clwitchcrafttd',
+'clwolfenstein',
+'clwolfenstein3d',
+'clwoodworm',
+'clwordle',
+'clworldcup98',
+'clworldshardestgame',
+'clworldshardestgame2',
+'clworldshardestgame3',
+'clworldshardestgame4',
+'clwrassling',
+'clwrestlebros',
+'clXevious',
+'clyanderesimulator',
+'clyarsrevenge',
+'clyellow',
+'clYoshisStrangeQuest',
+'clyouarelucky',
+'clyouvs100skibidi(1)',
+'clyouvs100skibidi',
+'clyumenikki',
+'clzelda2thelegendoflink',
+'clzeldaminishcap',
+'clzenword',
+'clzombieexploder',
+'clzombieroad',
+'clzombierush',
+'clzombiesatemyneighboors',
+'clzombopaclypse2',
+'clzombotron',
+'clzombotron2',
+'clzombotronreboot',
+'clzrist',
+'clzuma',
+'clzumashooter',
+'cl oo',
+'cl?',
+'codeorg',
+'Dragonxclient',
+'Eaglercraft-Alpha-1.2.6-Offline',
+'Eaglercraft-Beta-1.3-Offline',
+'Eaglercraft-Indev-Offline (1)',
+'Eaglercraft-Indev-Offline',
+'eaglercraft.1.5.2',
+'EaglercraftL_1.9_v0_7_0_Offline_Signed',
+'EaglercraftX 1.8.8(u29)',
+'EaglercraftZ_1.11.2',
+'filenames.txt',
+'Helios-Offline (1)',
+'marbleracer',
+'mariobuilder64',
+'Minceraft-I-NotMine_V6',
+'mortalkombat4',
+'polytrackbutnotflagged',
+'rocketknight2',
+'sandstone',
+'sdf',
+'snowbros',
+'superdromebugs',
+'vvvvvv',
+'wilywars'
+];
+
+
+var _opened = document.querySelector('meta[name="deepg-opened"]');
+
+if (!_opened) {
+  // Google fake — busca dispara animação
+  var gInput = document.getElementById('gSearchInput');
+  function gSearch(e) {
+    if (e) e.preventDefault();
+    startAnti();
+  }
+  gInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') gSearch(e); });
+  document.getElementById('gSearchBtn').addEventListener('click', gSearch);
+  document.getElementById('gLuckyBtn').addEventListener('click', gSearch);
+  setTimeout(function() { gInput.focus(); }, 300);
+}
+
+function startAnti() {
+  document.getElementById('gpage').classList.add('hide');
+  var anti = document.getElementById('antiOver');
+  anti.classList.add('show');
+
+  var status = document.getElementById('antiStatus');
+  var msgs = ['CONECTANDO...', 'BYPASSANDO HISTÓRICO...', 'CARREGANDO...', 'PRONTO!'];
+  var mi = 0;
+  var statusInt = setInterval(function() {
+    if (mi < msgs.length) { status.textContent = msgs[mi]; mi++; }
+    else clearInterval(statusInt);
+  }, 600);
+
+  setTimeout(function() { openAboutBlank(); }, 2500);
+}
+
+function openAboutBlank() {
+  var html = document.documentElement.outerHTML;
+  html = html.replace('<head>', '<head><meta name="deepg-opened" content="true">');
+  html = html.replace('<div id="gpage"', '<div id="gpage" style="display:none"');
+  html = html.replace('<div id="antiOver"', '<div id="antiOver" style="display:none"');
+  html = html.replace('<div id="deepg"', '<div id="deepg" class="show"');
+  html = html.replace('<title>Google</title>', '<title>Deep G+</title>');
+
+  var w = null;
+  try { w = window.open('about:blank', '_blank'); } catch(e) { w = null; }
+
+  if (w && w.document) {
+    w.document.open();
+    w.document.write('<!DOCTYPE html>' + html);
+    w.document.close();
+    setTimeout(function() { try { window.close(); } catch(e) {} }, 500);
+  } else {
+    try {
+      var w2 = window.open('about:blank', '_self');
+      if (w2 && w2.document) {
+        w2.document.open(); w2.document.write('<!DOCTYPE html>' + html); w2.document.close();
+        return;
+      }
+    } catch(e) {}
+    document.open();
+    document.write('<!DOCTYPE html>' + html);
+    document.close();
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(function() { t.classList.remove('show') }, 2500);
+}
+
+function initSite() {
+  var gp = document.getElementById('gpage');
+  var ao = document.getElementById('antiOver');
+  if (gp) gp.style.display = 'none';
+  if (ao) ao.style.display = 'none';
+
+  var DF = {disguiseTitle:'Google', disguiseFavicon:'https://www.google.com/favicon.ico', hideUrl:'https://www.google.com'};
+  function getSet() {
+    try { return Object.assign({}, DF, JSON.parse(localStorage.getItem('dg_set') || '{}')); }
+    catch(e) { return Object.assign({}, DF); }
+  }
+
+  window.saveSettings = function() {
+    var s = {
+      disguiseTitle: document.getElementById('sdt').value.trim() || DF.disguiseTitle,
+      disguiseFavicon: document.getElementById('sdf').value.trim() || DF.disguiseFavicon,
+      hideUrl: document.getElementById('shu').value.trim() || DF.hideUrl
+    };
+    localStorage.setItem('dg_set', JSON.stringify(s));
+    var m = document.getElementById('ssv'); m.style.display = 'block';
+    setTimeout(function() { m.style.display = 'none'; }, 2000);
+  };
+
+  window.resetSettings = function() {
+    localStorage.removeItem('dg_set');
+    populateSettings();
+    var m = document.getElementById('ssv'); m.textContent = '✓ Resetado!';
+    m.style.display = 'block';
+    setTimeout(function() { m.style.display = 'none'; m.textContent = '✓ Salvo!'; }, 2000);
+  };
+
+  window.populateSettings = function() {
+    var s = getSet();
+    document.getElementById('sdt').value = s.disguiseTitle;
+    document.getElementById('sdf').value = s.disguiseFavicon;
+    document.getElementById('shu').value = s.hideUrl;
+  };
+
+  window.disguiseSite = function() {
+    var s = getSet();
+    document.title = s.disguiseTitle;
+    var f = document.getElementById('favicon');
+    if (f) f.href = s.disguiseFavicon;
+    showToast('Site disfarçado!');
+  };
+
+  var sh = false, ifr = null, ovl = null;
+  window.hideSite = function() {
+    if (!sh) {
+      ifr = document.createElement('iframe');
+      ifr.src = getSet().hideUrl;
+      ifr.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99998;border:none';
+      document.body.appendChild(ifr);
+      ovl = document.createElement('div');
+      ovl.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;cursor:pointer';
+      ovl.onclick = function() { ifr.remove(); ifr=null; ovl.remove(); ovl=null; sh=false; };
+      document.body.appendChild(ovl);
+      sh = true;
+      showToast('Site escondido — clique para mostrar');
+    } else {
+      if (ifr) { ifr.remove(); ifr = null; }
+      if (ovl) { ovl.remove(); ovl = null; }
+      sh = false;
+    }
+  };
+
+  window.cloneSite = function() {
+    var w = window.open('about:blank', '_blank');
+    if (w) {
+      w.document.open();
+      w.document.write('<!DOCTYPE html>' + document.documentElement.outerHTML);
+      w.document.close();
+      showToast('Site clonado!');
+    } else {
+      showToast('Popup bloqueado!');
+    }
+  };
+
+  window.downloadSite = function() {
+    var b = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'Deep_G_Plus.html';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    showToast('Download iniciado!');
+  };
+
+  // ===== XP / LEVEL SYSTEM =====
+  var lvl = parseInt(localStorage.getItem('dg_lvl')) || 0;
+  var xp = parseInt(localStorage.getItem('dg_xp')) || 0;
+
+  var pfps = {
+    0: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%2300e676'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23000' font-family='Arial' font-weight='bold'%3EL0%3C/text%3E%3C/svg%3E",
+    5: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%2369f0ae'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23000' font-family='Arial' font-weight='bold'%3EL5%3C/text%3E%3C/svg%3E",
+    10: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%231e90ff'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='bold'%3EL10%3C/text%3E%3C/svg%3E",
+    25: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23ffd740'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23000' font-family='Arial' font-weight='bold'%3EL25%3C/text%3E%3C/svg%3E",
+    50: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23b388ff'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23000' font-family='Arial' font-weight='bold'%3EL50%3C/text%3E%3C/svg%3E",
+    100: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='50' fill='%23ff5252'/%3E%3Ctext x='50' y='65' font-size='35' text-anchor='middle' fill='%23fff' font-family='Arial' font-weight='bold'%3EL100%3C/text%3E%3C/svg%3E"
+  };
+
+  function xpNeed(l) { return Math.floor(100 * Math.pow(1.001, l)); }
+  function xpPer() { return 25 + Math.floor(lvl / 10) * 5; }
+
+  function updXP() {
+    var n = xpNeed(lvl);
+    document.getElementById('levelText').textContent = 'Level ' + lvl;
+    document.getElementById('xpText').textContent = xp + ' / ' + n + ' XP (' + xpPer() + '/jogo)';
+    document.getElementById('xpFill').style.width = (xp / n * 100) + '%';
+    var cp = localStorage.getItem('dg_pfp');
+    if (!cp) {
+      var c = pfps[0];
+      Object.keys(pfps).forEach(function(m) { if (lvl >= parseInt(m)) c = pfps[m]; });
+      document.getElementById('levelPfp').src = c;
+    } else {
+      document.getElementById('levelPfp').src = cp;
+    }
+  }
+
+  window.addXP = function(a) {
+    xp += a;
+    while (xp >= xpNeed(lvl)) {
+      xp -= xpNeed(lvl); lvl++;
+      showToast('Level up! Agora nível ' + lvl);
+    }
+    localStorage.setItem('dg_lvl', lvl);
+    localStorage.setItem('dg_xp', xp);
+    updXP();
+  };
+  window.xpPerGame = xpPer;
+
+  if (lvl >= 50) {
+    document.getElementById('levelPfp').onclick = function() {
+      var u = Object.keys(pfps).filter(function(m) { return lvl >= parseInt(m); }).map(function(m) { return pfps[m]; });
+      var c = prompt('Escolha:\n' + u.map(function(_, i) { return i + ': Avatar ' + (i+1); }).join('\n'));
+      if (u[c]) { localStorage.setItem('dg_pfp', u[c]); document.getElementById('levelPfp').src = u[c]; }
+    };
+  }
+  updXP();
+
+  // ===== PINNED =====
+  window.getPinned = function() {
+    try { return JSON.parse(localStorage.getItem('dg_pin') || '[]'); } catch(e) { return []; }
+  };
+  window.togglePin = function(f) {
+    var p = getPinned();
+    if (p.includes(f)) {
+      p = p.filter(function(x) { return x !== f; });
+      showToast('Removido dos favoritos');
+    } else {
+      if (p.length >= 3) { showToast('Máximo 3 favoritos!'); return; }
+      p.push(f);
+      showToast('Adicionado aos favoritos!');
+    }
+    localStorage.setItem('dg_pin', JSON.stringify(p));
+    renderPinned(); refreshPins();
+  };
+  window.refreshPins = function() {
+    var p = getPinned();
+    document.querySelectorAll('.pin-btn[data-file]').forEach(function(b) {
+      if (p.includes(b.dataset.file)) b.classList.add('pinned');
+      else b.classList.remove('pinned');
+    });
+  };
+  function renderPinned() {
+    var c = document.getElementById('pinnedGames');
+    var p = getPinned();
+    document.getElementById('pinCount').textContent = p.length + '/3';
+    if (!p.length) {
+      c.innerHTML = '<span class="empty">Nenhum jogo fixado</span>';
+      return;
+    }
+    c.innerHTML = '';
+    p.forEach(function(f) {
+      var card = document.createElement('div'); card.className = 'pin-card';
+      var l = document.createElement('span');
+      l.textContent = '★ ' + f.replace(/^cl/i, '');
+      l.style.cursor = 'pointer';
+      l.onclick = function() { recordRecent(f); openGame(f); };
+      var x = document.createElement('button');
+      x.className = 'unpin'; x.textContent = '✕'; x.title = 'Desafixar';
+      x.onclick = function(e) { e.stopPropagation(); togglePin(f); };
+      card.appendChild(l); card.appendChild(x);
+      c.appendChild(card);
+    });
+  }
+  window.renderPinned = renderPinned;
+  renderPinned();
+
+  // ===== RECENT =====
+  window.getRecent = function() {
+    try { return JSON.parse(localStorage.getItem('dg_rec') || '[]'); } catch(e) { return []; }
+  };
+  window.recordRecent = function(f) {
+    var r = getRecent().filter(function(x) { return x !== f; });
+    r.unshift(f); r = r.slice(0, 8);
+    localStorage.setItem('dg_rec', JSON.stringify(r));
+    renderRecent();
+  };
+  function renderRecent() {
+    var c = document.getElementById('recentGames');
+    var r = getRecent();
+    document.getElementById('recCount').textContent = r.length;
+    if (!r.length) {
+      c.innerHTML = '<span class="empty">Nenhum jogo jogado</span>';
+      return;
+    }
+    c.innerHTML = '';
+    r.forEach(function(f) {
+      var card = document.createElement('div'); card.className = 'rec-card';
+      card.textContent = '▶ ' + f.replace(/^cl/i, '');
+      card.onclick = function() { recordRecent(f); openGame(f); };
+      c.appendChild(card);
+    });
+  }
+  window.renderRecent = renderRecent;
+  renderRecent();
+
+  // ===== OPEN GAME =====
+  function openGame(f) {
+    var n = f.endsWith('.html') ? f : f + '.html';
+    showToast('Carregando ' + f.replace(/^cl/i, '') + '...');
+    fetch('https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/' + encodeURIComponent(n) + '?t=' + Date.now())
+      .then(function(r) { return r.text(); })
+      .then(function(t) {
+        var w = window.open('about:blank', '_blank');
+        if (w) { w.document.open(); w.document.write(t); w.document.close(); }
+        else { showToast('Popup bloqueado — permita pop-ups!'); }
+      })
+      .catch(function() { showToast('Erro ao carregar jogo!'); });
+  }
+  window.openGame = openGame;
+
+  // ===== SEARCH =====
+  var sb = document.getElementById('searchBox'), sr = document.getElementById('searchResults');
+  sb.addEventListener('input', function() {
+    var q = sb.value.toLowerCase();
+    sr.innerHTML = '';
+    if (!q) return;
+    files.filter(function(f) { return f.toLowerCase().indexOf(q) >= 0; })
+      .slice(0, 100)
+      .forEach(function(f) {
+        var d = document.createElement('div'); d.className = 'search-item';
+        d.textContent = f.replace(/^cl/i, '');
+        d.onclick = function() { addXP(xpPer()); recordRecent(f); openGame(f); };
+        sr.appendChild(d);
+      });
+  });
+
+  // ===== GENERATE SECTIONS =====
+  genSections();
+  showToast('Bem-vindo ao Deep G+!');
+}
+
+function genSections() {
+  var chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+  var fbc = {}; chars.forEach(function(c) { fbc[c] = []; });
+  files.forEach(function(f) {
+    var l = f.toLowerCase();
+    if (l.startsWith('cl')) {
+      var a = l.substring(2);
+      if (a.length > 0) {
+        var fc = a[0].toUpperCase();
+        if (fbc[fc]) fbc[fc].push(f);
+      }
+    }
+  });
+
+  var c = document.getElementById('sections-container');
+  if (!c) return;
+  c.innerHTML = '';
+
+  chars.forEach(function(ch) {
+    var s = document.createElement('div');
+    s.className = 'letter'; s.id = 'sec-' + ch;
+
+    var h = document.createElement('div');
+    h.className = 'letter-head';
+    h.innerHTML = '<span>' + ch + '</span><span class="letter-count">' + fbc[ch].length + ' jogos</span>';
+    s.appendChild(h);
+
+    var grid = document.createElement('div');
+    grid.className = 'games-grid';
+
+    if (fbc[ch].length > 0) {
+      fbc[ch].forEach(function(f) {
+        var clean = f.replace(/^cl/i, '');
+        var row = document.createElement('div'); row.className = 'game-row';
+
+        var pb = document.createElement('button');
+        pb.className = 'game-btn'; pb.type = 'button';
+        pb.textContent = clean;
+        pb.onclick = function() { addXP(xpPerGame()); recordRecent(f); openGame(f); };
+
+        var dl = document.createElement('button');
+        dl.className = 'dl-btn'; dl.textContent = '⬇'; dl.title = 'Baixar';
+        dl.onclick = function() {
+          var n = f.endsWith('.html') ? f : f + '.html';
+          fetch('https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/' + encodeURIComponent(n) + '?t=' + Date.now())
+            .then(function(r) { return r.text(); })
+            .then(function(t) {
+              var b = new Blob([t], {type:'text/html'});
+              var a = document.createElement('a');
+              a.href = URL.createObjectURL(b); a.download = n; a.click();
+              URL.revokeObjectURL(a.href);
+              showToast('Download: ' + clean);
+            });
+        };
+
+        var pn = document.createElement('button');
+        pn.className = 'pin-btn'; pn.dataset.file = f; pn.textContent = '★'; pn.title = 'Fixar';
+        var ups = function() {
+          var p = getPinned();
+          if (p.includes(f)) pn.classList.add('pinned');
+          else pn.classList.remove('pinned');
+        };
+        ups();
+        pn.onclick = function() { togglePin(f); ups(); };
+
+        row.appendChild(pb); row.appendChild(dl); row.appendChild(pn);
+        grid.appendChild(row);
+      });
+    } else {
+      var e = document.createElement('div');
+      e.className = 'empty'; e.textContent = 'Sem jogos';
+      grid.appendChild(e);
+    }
+
+    s.appendChild(grid);
+    c.appendChild(s);
+  });
+
+  // Sidebar
+  var sb = document.getElementById('sidebar');
+  sb.innerHTML = '<div class="sidebar-head">A-Z</div>';
+  chars.forEach(function(ch) {
+    var b = document.createElement('button');
+    b.className = 'sidebar-btn'; b.textContent = ch;
+    if (fbc[ch].length === 0) b.classList.add('empty');
+    else {
+      b.onclick = function() {
+        var s = document.getElementById('sec-' + ch);
+        if (s) s.scrollIntoView({behavior:'smooth', block:'start'});
+      };
+    }
+    sb.appendChild(b);
+  });
+}
+
+if (_opened) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(initSite, 100); });
+  } else {
+    setTimeout(initSite, 100);
+  }
+}
+</script>
+
+</body>
+</html>
